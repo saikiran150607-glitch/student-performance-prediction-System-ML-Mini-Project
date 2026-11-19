@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}ML Model Training | Student Performance Prediction System{% endblock %}
+{% block page_title %}Machine Learning Model Training & Comparative Evaluation{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- ACTION & OVERVIEW BANNER -->
+    <div class="app-card mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+        <div class="app-card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-primary px-3 py-1 rounded-pill fw-semibold mb-2">
+                        <i class="bi bi-diagram-3-fill me-1"></i> 4-Algorithm Comparative Benchmark
+                    </span>
+                    <h3 class="fw-bold mb-1 text-white">Machine Learning Classification Pipeline</h3>
+                    <p class="text-white-50 mb-3" style="max-width: 650px;">
+                        Standardized evaluation across four supervised classifiers. Preprocessing pipelines prevent data leakage by fitting scaling exclusively on training partitions.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <form action="{{ url_for('model_training') }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                                <i class="bi bi-arrow-repeat me-1"></i> Retrain & Compare All 4 Models
+                            </button>
+                        </form>
+                        <a href="{{ url_for('dataset') }}" class="btn btn-outline-light px-3 py-2 rounded-3">
+                            <i class="bi bi-database me-1"></i> Manage Training Dataset
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block text-end pe-3">
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 text-start border border-white border-opacity-10">
+                        <small class="text-info text-uppercase fw-bold letter-spacing-1">Current Selected Best Model</small>
+                        <h4 class="fw-bold text-white mb-1">{{ active_model_name }}</h4>
+                        <span class="badge bg-success text-white px-2 py-1 small">
+                            <i class="bi bi-trophy-fill me-1"></i> Highest Evaluation Score
+                        </span>
+                        <div class="text-white-50 small mt-2">
+                            Saved to <code>models/best_model.joblib</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPARISON TABLE CARD -->
+    <div class="app-card mb-4">
+        <div class="app-card-header d-flex justify-content-between align-items-center">
+            <h5>
+                <i class="bi bi-table text-primary"></i> Algorithm Performance Comparison
+            </h5>
+            <small class="text-muted">Stratified 80/20 Split &bull; random_state=42 &bull; Metric: F1-Score & Accuracy</small>
+        </div>
+        <div class="app-card-body p-0">
+            <div class="table-responsive">
+                <table class="custom-table table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Preprocessing Pipeline</th>
+                            <th>Accuracy (%)</th>
+                            <th>Precision (%)</th>
+                            <th>Recall (%)</th>
+                            <th>F1-Score (%)</th>
+                            <th>5-Fold CV F1</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in models %}
+                        <tr class="{{ 'table-primary bg-opacity-10 fw-semibold' if m.is_best else '' }}">
+                            <td class="fw-bold text-dark">
+                                <i class="bi bi-cpu text-primary me-1"></i> {{ m.model_name }}
+                            </td>
+                            <td>
+                                {% if 'Logistic' in m.model_name or 'KNN' in m.model_name %}
+                                    <span class="badge bg-light text-dark border">StandardScaler + Pipeline</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border">Raw Features (Tree Ensemble)</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary fs-6">{{ m.accuracy }}%</span>
+                            </td>
+                            <td>{{ m.precision }}%</td>
+                            <td>{{ m.recall }}%</td>
+                            <td>
+                                <strong class="text-dark">{{ m.f1_score }}%</strong>
+                            </td>
+                            <td>
+                                <span class="text-muted small">{{ m.cv_f1_mean }}%</span>
+                            </td>
+                            <td>
+                                {% if m.is_best %}
+                                    <span class="badge-best-model">
+                                        <i class="bi bi-check-circle-fill"></i> Selected Best
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-secondary border">Evaluated</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISUAL COMPARISON CHART & CONFUSION MATRICES ROW -->
+    <div class="row g-4 mb-4">
+        <!-- Interactive Chart.js Accuracy & F1 Comparison -->
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-bar-chart-line-fill text-primary"></i> Performance Metrics Comparison</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 320px;">
+                        <canvas id="modelComparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confusion Matrix Breakdown Cards -->
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-grid-3x3-gap-fill text-indigo"></i> Test Set Confusion Matrices (2x2)</h5>
+                </div>
+                <div class="app-card-body">
+                    <div class="row g-3">
+                        {% for m in models %}
+                        <div class="col-sm-6">
+                            <div class="border rounded-3 p-3 bg-light h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold small text-dark">{{ m.model_name }}</span>
+                                    {% if m.is_best %}
+                                        <span class="badge bg-primary" style="font-size: 0.65rem;">BEST</span>
+                                    {% endif %}
+                                </div>
+                                <table class="cm-table">
+                                    <tr>
+                                        <td class="cm-cell cm-tn" title="True Negative (Correct Fail)">
+                                            <span class="cm-label">TN (Support)</span>
+                                            {{ m.confusion_matrix[0][0] if m.confusion_matrix|length > 0 else 0 }}
+                                        </td>
+                                        <td class="cm-cell cm-fp" title="False Positive (Incorrect Pass)">
+                                            <span class="cm-label">FP (Type I)</span>
+                                            {{ m.confusion_matrix[0][1] if m.confusion_matrix|length > 0 and m.confusion_matrix[0]|length > 1 else 0 }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cm-cell cm-fn" title="False Negative (Missed Support)">
+                                            <span class="cm-label">FN (Type II)</span>
+                                            {{ m.confusion_matrix[1][0] if m.confusion_matrix|length > 1 else 0 }}
+                                        </td>
+                                        <td class="cm-cell cm-tp" title="True Positive (Correct Pass)">
+                                            <span class="cm-label">TP (Pass)</span>
+                                            {{ m.confusion_matrix[1][1] if m.confusion_matrix|length > 1 and m.confusion_matrix[1]|length > 1 else 0 }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TECHNICAL RIGOR & ETHICAL ML NOTES -->
+    <div class="app-card">
+        <div class="app-card-header">
+            <h5><i class="bi bi-mortarboard-fill text-primary"></i> Machine Learning Rigor & Review Defense</h5>
+        </div>
+        <div class="app-card-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="border-start border-primary border-3 ps-3">
+                        <h6 class="fw-bold text-dark mb-1">Dynamic Selection</h6>
+                        <p class="text-muted small mb-0">
+                            The system does not blindly hardcode Random Forest as the superior algorithm. The best model is selected dynamically using harmonic mean (F1-score) and test accuracy.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border-start border-success border-3 ps-3">
+                        <h6 class="fw-bold text-dark mb-1">Leakage Prevention</h6>
+                        <p class="text-muted small mb-0">
+                            StandardScaler is embedded inside Scikit-learn Pipelines. Parameters ($\mu, \sigma$) are learned strictly on the training partition and transformed on test sets.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border-start border-warning border-3 ps-3">
+                        <h6 class="fw-bold text-dark mb-1">Sample Size Integrity</h6>
+                        <p class="text-muted small mb-0">
+                            Small datasets are flagged with caution banners. Illustrative demonstration data is clearly distinguished from real institutional data to maintain scientific integrity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modelNames = {{ models | map(attribute='model_name') | list | tojson }};
+    const accuracyValues = {{ models | map(attribute='accuracy') | list | tojson }};
+    const f1Values = {{ models | map(attribute='f1_score') | list | tojson }};
+
+    const ctx = document.getElementById('modelComparisonChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: modelNames,
+            datasets: [
+                {
+                    label: 'Accuracy (%)',
+                    data: accuracyValues,
+                    backgroundColor: '#2563eb',
+                    borderRadius: 6
+                },
+                {
+                    label: 'F1-Score (%)',
+                    data: f1Values,
+                    backgroundColor: '#10b981',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { boxWidth: 14, font: { family: 'Inter', size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(c) { return ` ${c.dataset.label}: ${c.raw}%`; }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { callback: function(val) { return val + '%'; } }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

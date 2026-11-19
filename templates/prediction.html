@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Performance | Student Performance Prediction System{% endblock %}
+{% block page_title %}Predict Student Academic Performance{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div class="row g-4">
+        <!-- FORM COLUMN -->
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-cpu text-primary"></i> Academic Input Parameters</h5>
+                </div>
+                <div class="app-card-body">
+                    <p class="text-muted small mb-4">
+                        Enter the student's academic metrics below. The trained machine learning model (<strong class="text-primary">{{ active_model_name }}</strong>) will evaluate the pattern and return a decision-support assessment.
+                    </p>
+
+                    <form action="{{ url_for('prediction') }}" method="POST" id="predictionForm">
+                        <!-- Student ID -->
+                        <div class="mb-3">
+                            <label for="student_id" class="form-label fw-semibold small text-secondary">
+                                Student ID / Roll Number <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-card-text text-muted"></i></span>
+                                <input type="text" class="form-control" id="student_id" name="student_id" placeholder="e.g. STU001 or 25RBAIM0030" value="{{ form_data.student_id if form_data else '' }}" required>
+                            </div>
+                            <div class="form-text">Unique identification key for student record.</div>
+                        </div>
+
+                        <!-- Attendance Percentage -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="attendance" class="form-label fw-semibold small text-secondary mb-0">
+                                    Attendance Percentage (%) <span class="text-danger">*</span>
+                                </label>
+                                <span class="badge bg-light text-dark border" id="attBadge">0 - 100%</span>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-calendar-check text-muted"></i></span>
+                                <input type="number" step="0.1" min="0" max="100" class="form-control" id="attendance" name="attendance" placeholder="e.g. 85.5" value="{{ form_data.attendance if form_data else '' }}" required>
+                                <span class="input-group-text bg-light">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Daily Study Hours -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="study_hours" class="form-label fw-semibold small text-secondary mb-0">
+                                    Daily Study Hours <span class="text-danger">*</span>
+                                </label>
+                                <span class="badge bg-light text-dark border">0 - 24 Hours</span>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-clock text-muted"></i></span>
+                                <input type="number" step="0.1" min="0" max="24" class="form-control" id="study_hours" name="study_hours" placeholder="e.g. 4.5" value="{{ form_data.study_hours if form_data else '' }}" required>
+                                <span class="input-group-text bg-light">hrs/day</span>
+                            </div>
+                        </div>
+
+                        <!-- Internal Assessment Marks -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="marks" class="form-label fw-semibold small text-secondary mb-0">
+                                    Internal Assessment Marks (out of 50) <span class="text-danger">*</span>
+                                </label>
+                                <span class="badge bg-light text-dark border">0 - 50 Marks</span>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-pencil-square text-muted"></i></span>
+                                <input type="number" step="0.1" min="0" max="50" class="form-control" id="marks" name="marks" placeholder="e.g. 42" value="{{ form_data.marks if form_data else '' }}" required>
+                                <span class="input-group-text bg-light">/ 50</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm mb-3">
+                            <i class="bi bi-lightning-charge-fill me-1"></i> Predict Performance
+                        </button>
+                    </form>
+
+                    <!-- QUICK DEMO PRESETS FOR FACULTY VIVA -->
+                    <div class="border-top pt-3 mt-3">
+                        <small class="text-muted fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem;">
+                            <i class="bi bi-stars text-warning me-1"></i> Quick Test Presets (Report Examples):
+                        </small>
+                        <div class="d-flex flex-wrap gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU001', 90, 5, 45)">
+                                STU001 (90%, 5h, 45) &bull; Pass
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU002', 45, 1, 18)">
+                                STU002 (45%, 1h, 18) &bull; Fail
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU003', 80, 4, 38)">
+                                STU003 (80%, 4h, 38) &bull; Pass
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU004', 55, 2, 22)">
+                                STU004 (55%, 2h, 22) &bull; Fail
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU005', 75, 3, 35)">
+                                STU005 (75%, 3h, 35) &bull; Pass
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;" onclick="setDemo('STU006', 40, 1, 15)">
+                                STU006 (40%, 1h, 15) &bull; Fail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREDICTION RESULT DISPLAY COLUMN -->
+        <div class="col-lg-7">
+            {% if result %}
+                <div class="prediction-card {{ 'pass-card' if result.predicted_result == 'Likely to Pass' else 'support-card' }} h-100">
+                    <div class="result-header">
+                        <div>
+                            <span class="text-uppercase fw-bold text-muted small letter-spacing-1">Machine Learning Evaluation</span>
+                            <h4 class="fw-bold mb-0 text-dark">Student ID: {{ form_data.student_id }}</h4>
+                        </div>
+                        <div>
+                            {% if result.predicted_result == 'Likely to Pass' %}
+                                <div class="result-badge-huge badge-pass">
+                                    <i class="bi bi-check-circle-fill"></i> LIKELY TO PASS
+                                </div>
+                            {% else %}
+                                <div class="result-badge-huge badge-support">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> MAY NEED SUPPORT
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Input Summary Pills -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-4">
+                            <div class="bg-white p-2 rounded-3 text-center border">
+                                <small class="text-muted d-block">Attendance</small>
+                                <strong class="fs-6 text-dark">{{ result.attendance }}%</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="bg-white p-2 rounded-3 text-center border">
+                                <small class="text-muted d-block">Daily Study</small>
+                                <strong class="fs-6 text-dark">{{ result.study_hours }} Hours</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="bg-white p-2 rounded-3 text-center border">
+                                <small class="text-muted d-block">Internal Marks</small>
+                                <strong class="fs-6 text-dark">{{ result.marks }} / 50</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confidence / Probability Meter -->
+                    <div class="confidence-bar-wrapper">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold small text-secondary">
+                                <i class="bi bi-speedometer2 text-primary me-1"></i> Model Confidence Score
+                            </span>
+                            <span class="badge bg-dark fw-bold">{{ result.confidence_pct }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {{ 'bg-success' if result.predicted_result == 'Likely to Pass' else 'bg-danger' }}" 
+                                 role="progressbar" 
+                                 style="width: {{ result.confidence_pct }};" 
+                                 aria-valuenow="{{ result.confidence_pct.replace('%', '') }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mt-1" style="font-size: 0.72rem;">
+                            <span>Active Classifier: <strong>{{ result.model_name }}</strong></span>
+                            <span>Calculated via class probability distribution</span>
+                        </div>
+                    </div>
+
+                    <!-- Guidance Message -->
+                    <div class="alert {{ 'alert-success' if result.predicted_result == 'Likely to Pass' else 'alert-danger' }} border-0 rounded-3 mb-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi {{ 'bi-info-circle-fill' if result.predicted_result == 'Likely to Pass' else 'bi-exclamation-octagon-fill' }} fs-5 mt-1"></i>
+                            <div>
+                                <strong>Assessment Feedback:</strong><br>
+                                {{ result.message }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actionable Academic Recommendations -->
+                    <div class="bg-white p-3 rounded-3 border mb-3">
+                        <h6 class="fw-bold mb-2 text-dark">
+                            <i class="bi bi-card-checklist text-primary me-1"></i> Recommended Academic Action Plan:
+                        </h6>
+                        <ul class="recommendations-list">
+                            {% for rec in result.recommendations %}
+                            <li>
+                                <i class="bi bi-check-circle-fill text-{{ 'success' if result.predicted_result == 'Likely to Pass' else 'danger' }}"></i>
+                                <span>{{ rec }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Disclaimer -->
+                    <div class="disclaimer-box">
+                        <i class="bi bi-shield-exclamation text-primary me-1"></i>
+                        <strong>Decision-Support Notice:</strong> {{ result.disclaimer }}
+                    </div>
+
+                </div>
+            {% else %}
+                <!-- Placeholder when no prediction has been submitted yet -->
+                <div class="app-card h-100 d-flex flex-column align-items-center justify-content-center text-center p-5">
+                    <div class="stat-icon icon-blue mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2.2rem;">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Awaiting Student Parameters</h5>
+                    <p class="text-muted small mb-4" style="max-width: 420px;">
+                        Fill in the student ID, attendance, study hours, and internal marks on the left and click <strong>Predict Performance</strong> to evaluate outcomes using the trained machine learning pipeline.
+                    </p>
+                    <div class="p-3 bg-light rounded-3 text-start border small text-muted" style="max-width: 420px;">
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.85rem;"><i class="bi bi-check2-all text-primary me-1"></i> How Prediction Works:</h6>
+                        <ul class="mb-0 ps-3">
+                            <li>Values are verified against institutional limits (Att: 0-100%, Study: 0-24h, Marks: 0-50).</li>
+                            <li>Trained ML model pipeline applies feature normalization and generates inference.</li>
+                            <li>Outcome and confidence metrics are permanently logged in SQLite for audit history.</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setDemo(sid, att, hours, marks) {
+    document.getElementById('student_id').value = sid;
+    document.getElementById('attendance').value = att;
+    document.getElementById('study_hours').value = hours;
+    document.getElementById('marks').value = marks;
+}
+</script>
+{% endblock %}

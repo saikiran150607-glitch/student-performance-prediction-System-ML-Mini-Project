@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}About Project | Student Performance Prediction System{% endblock %}
+{% block page_title %}About College Mini Project & ML Architecture{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- PROJECT HEADER HERO -->
+    <div class="app-card mb-4" style="background: linear-gradient(135deg, #0a0f1d 0%, #1e293b 100%); color: #ffffff;">
+        <div class="app-card-body p-4 p-md-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-info text-dark px-3 py-1 rounded-pill fw-bold mb-3">
+                        <i class="bi bi-mortarboard-fill me-1"></i> College Mini Project
+                    </span>
+                    <h2 class="fw-bold mb-2 text-white">STUDENT PERFORMANCE PREDICTION SYSTEM</h2>
+                    <h5 class="text-info fw-semibold mb-3">A Real-Life Application Using Machine Learning Algorithms</h5>
+                    <p class="text-white-50 lead fs-6 mb-4" style="max-width: 720px;">
+                        The Student Performance Prediction System uses machine learning algorithms to analyze student attendance, daily study hours, and internal assessment marks to estimate academic performance and identify students who may benefit from additional academic support.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="bg-white bg-opacity-10 px-3 py-2 rounded-3 border border-white border-opacity-10">
+                            <small class="text-info d-block fw-semibold">Project Area</small>
+                            <span class="fw-bold text-white">Machine Learning & Web Systems</span>
+                        </div>
+                        <div class="bg-white bg-opacity-10 px-3 py-2 rounded-3 border border-white border-opacity-10">
+                            <small class="text-info d-block fw-semibold">Framework</small>
+                            <span class="fw-bold text-white">Python &bull; Flask &bull; Scikit-learn</span>
+                        </div>
+                        <div class="bg-white bg-opacity-10 px-3 py-2 rounded-3 border border-white border-opacity-10">
+                            <small class="text-info d-block fw-semibold">Database</small>
+                            <span class="fw-bold text-white">SQLite (ACID Compliant)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                    <!-- STUDENT DETAILS CARD -->
+                    <div class="bg-white text-dark p-4 rounded-4 shadow-lg border">
+                        <h6 class="text-uppercase fw-bold text-primary small mb-3">
+                            <i class="bi bi-person-badge-fill me-1"></i> Project Contributors
+                        </h6>
+                        
+                        <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
+                            <div class="stat-icon icon-blue" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">P. Sree Sai Kiran</h6>
+                                <span class="badge bg-primary-subtle text-primary fw-bold font-monospace">25RBAIM0030</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3">
+                            <div class="stat-icon icon-purple" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">R. Harshavardhan</h6>
+                                <span class="badge bg-purple-subtle text-indigo fw-bold font-monospace">25RBAIM0024</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-top text-center">
+                            <small class="text-muted">Mini Project Review &bull; Academic Year 2026</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TECHNOLOGY STACK OVERVIEW -->
+    <div class="app-card mb-4">
+        <div class="app-card-header">
+            <h5><i class="bi bi-stack text-primary"></i> Technology Stack Architecture</h5>
+        </div>
+        <div class="app-card-body">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-browser-chrome fs-4 text-primary"></i>
+                            <h6 class="fw-bold text-dark mb-0">Frontend</h6>
+                        </div>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li>&bull; HTML5 &amp; CSS3</li>
+                            <li>&bull; Bootstrap 5.3</li>
+                            <li>&bull; JavaScript (ES6)</li>
+                            <li>&bull; Chart.js (Interactive Visualizations)</li>
+                            <li>&bull; Bootstrap Icons</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-server fs-4 text-success"></i>
+                            <h6 class="fw-bold text-dark mb-0">Backend</h6>
+                        </div>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li>&bull; Python 3.14 / 3.x</li>
+                            <li>&bull; Flask Web Framework</li>
+                            <li>&bull; Jinja2 Templating</li>
+                            <li>&bull; Werkzeug Password Security</li>
+                            <li>&bull; Session State Management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-cpu fs-4 text-warning"></i>
+                            <h6 class="fw-bold text-dark mb-0">Machine Learning</h6>
+                        </div>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li>&bull; Scikit-learn (Pipelines, Metrics)</li>
+                            <li>&bull; Pandas (Dataframes, Cleaning)</li>
+                            <li>&bull; NumPy (Vector Mathematics)</li>
+                            <li>&bull; Joblib (Model Serialization)</li>
+                            <li>&bull; 4 Classification Algorithms</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-database-check fs-4 text-info"></i>
+                            <h6 class="fw-bold text-dark mb-0">Storage & Deploy</h6>
+                        </div>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li>&bull; SQLite Database (Zero-Config)</li>
+                            <li>&bull; Joblib (.joblib Model Artifact)</li>
+                            <li>&bull; CSV File Exports</li>
+                            <li>&bull; Windows <code>run.bat</code> Launcher</li>
+                            <li>&bull; VS Code Compatible</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 ALGORITHMS DETAILED METHODOLOGY -->
+    <div class="app-card mb-4">
+        <div class="app-card-header">
+            <h5><i class="bi bi-diagram-3 text-indigo"></i> Comparative Machine Learning Algorithms</h5>
+        </div>
+        <div class="app-card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded-3 border h-100">
+                        <h6 class="fw-bold text-dark mb-1">1. Logistic Regression</h6>
+                        <small class="text-primary fw-semibold d-block mb-2">Linear Probabilistic Classifier</small>
+                        <p class="text-muted small mb-0">
+                            Estimates log-odds of passing using a sigmoid function: $\sigma(z) = \frac{1}{1 + e^{-z}}$. Combined with <code>StandardScaler</code> to ensure scale invariance across attendance (0-100) and marks (0-50).
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded-3 border h-100">
+                        <h6 class="fw-bold text-dark mb-1">2. Decision Tree</h6>
+                        <small class="text-primary fw-semibold d-block mb-2">Non-Parametric Rule Learning</small>
+                        <p class="text-muted small mb-0">
+                            Splits feature space recursively based on Gini Impurity to construct intuitive if-then decision thresholds. Constrained with <code>max_depth=5</code> to prevent overfitting on sample boundaries.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded-3 border h-100">
+                        <h6 class="fw-bold text-dark mb-1">3. Random Forest</h6>
+                        <small class="text-primary fw-semibold d-block mb-2">Ensemble Bagging Classifier</small>
+                        <p class="text-muted small mb-0">
+                            Builds an ensemble of 100 decorrelated decision trees with bootstrap aggregation. Reduces variance and prevents single-tree bias when mapping borderline academic features.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded-3 border h-100">
+                        <h6 class="fw-bold text-dark mb-1">4. K-Nearest Neighbors</h6>
+                        <small class="text-primary fw-semibold d-block mb-2">Instance-Based Learning</small>
+                        <p class="text-muted small mb-0">
+                            Classifies a query student based on the majority outcome of the $k=5$ most similar historical student vectors in normalized Euclidean space via <code>StandardScaler</code>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIVA REVIEW DEFENSE & QUESTIONS GUIDE -->
+    <div class="app-card mb-4">
+        <div class="app-card-header bg-light">
+            <h5><i class="bi bi-question-diamond-fill text-primary"></i> Faculty Viva & Review Preparation Guide</h5>
+        </div>
+        <div class="app-card-body">
+            <div class="accordion" id="vivaAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="vivaQ1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#vivaA1">
+                            Q1: Why did you use Machine Learning instead of hardcoded if/else rules?
+                        </button>
+                    </h2>
+                    <div id="vivaA1" class="accordion-collapse collapse show" data-bs-parent="#vivaAccordion">
+                        <div class="accordion-body small text-secondary">
+                            Hardcoded rules fail to capture non-linear trade-offs between features (for instance, a student with slightly lower attendance who studies 6 hours daily and scores high internal marks). Machine learning classification models learn continuous multi-dimensional boundary representations and provide probabilistic confidence scores.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="vivaQ2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vivaA2">
+                            Q2: How does the system prevent Data Leakage during model training?
+                        </button>
+                    </h2>
+                    <div id="vivaA2" class="accordion-collapse collapse" data-bs-parent="#vivaAccordion">
+                        <div class="accordion-body small text-secondary">
+                            We utilize Scikit-learn <code>Pipeline</code> objects. Feature scaling (such as <code>StandardScaler</code>) is fitted strictly on the training partition (<code>X_train</code>) during <code>pipe.fit()</code>. The test set (<code>X_test</code>) and incoming student inferences only undergo transformation using the learned training statistics, preventing test-set knowledge from contaminating the model.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="vivaQ3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vivaA3">
+                            Q3: Why compare 4 algorithms instead of assuming Random Forest is always best?
+                        </button>
+                    </h2>
+                    <div id="vivaA3" class="accordion-collapse collapse" data-bs-parent="#vivaAccordion">
+                        <div class="accordion-body small text-secondary">
+                            In empirical machine learning ("No Free Lunch Theorem"), no single algorithm dominates all problem domains. Our application trains Logistic Regression, Decision Trees, Random Forest, and KNN simultaneously on identical stratified splits, computes F1-scores, and automatically deploys the actual empirical winner to production.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="vivaQ4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vivaA4">
+                            Q4: What are the ethical safeguards implemented in this project?
+                        </button>
+                    </h2>
+                    <div id="vivaA4" class="accordion-collapse collapse" data-bs-parent="#vivaAccordion">
+                        <div class="accordion-body small text-secondary">
+                            Predictions are explicitly categorized as <strong>decision-support insights</strong> rather than deterministic verdicts. The system avoids labeling students as "Fail" or "Weak", instead using supportive terminology ("May Need Support") alongside actionable pedagogical recommendations (mentoring, study routines, remedial assignments). Teachers remain the final decision-makers.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

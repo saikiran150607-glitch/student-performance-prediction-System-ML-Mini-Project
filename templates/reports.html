@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics | Student Performance Prediction System{% endblock %}
+{% block page_title %}Academic Reports & Institution Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- REPORT ACTIONS -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 class="fw-bold mb-1 text-dark">Institutional Performance Report</h5>
+            <small class="text-muted">Comprehensive summary of academic cohorts, model assessments, and risk factors.</small>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="window.print();">
+                <i class="bi bi-printer me-1"></i> Print / Save PDF
+            </button>
+            <a href="{{ url_for('export_students_csv') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                <i class="bi bi-download me-1"></i> Export Full Cohort CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- 6 KPI SUMMARY METRIC CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Students Analyzed</small>
+                <h3 class="fw-bold text-dark mb-0">{{ data.stats.total_students }}</h3>
+                <small class="text-primary fw-semibold">100% evaluated</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Likely to Pass</small>
+                <h3 class="fw-bold text-success mb-0">{{ data.stats.pass_count }}</h3>
+                <small class="text-success fw-semibold">{{ data.pass_pct }}% of cohort</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Needing Support</small>
+                <h3 class="fw-bold text-danger mb-0">{{ data.stats.support_count }}</h3>
+                <small class="text-danger fw-semibold">{{ data.support_pct }}% at risk</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Avg Attendance</small>
+                <h3 class="fw-bold text-dark mb-0">{{ data.stats.avg_attendance }}%</h3>
+                <small class="text-muted">Target &ge; 75%</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Avg Internal Marks</small>
+                <h3 class="fw-bold text-dark mb-0">{{ data.stats.avg_marks }}</h3>
+                <small class="text-muted">Cutoff: 20 / 50</small>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="p-3 bg-white rounded-3 border text-center shadow-sm h-100">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Avg Study Hours</small>
+                <h3 class="fw-bold text-dark mb-0">{{ data.stats.avg_study_hours }}h</h3>
+                <small class="text-muted">per day</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 CHARTS FOR REPORTS -->
+    <div class="row g-4 mb-4">
+        <!-- 1. Pass vs Support -->
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-pie-chart text-success"></i> Pass vs Support Distribution</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 280px;">
+                        <canvas id="reportDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Attendance Distribution -->
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-calendar-check text-primary"></i> Attendance Distribution</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 280px;">
+                        <canvas id="reportAttChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Marks Distribution -->
+        <div class="col-lg-4">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-award text-purple"></i> Internal Marks Distribution</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 260px;">
+                        <canvas id="reportMarksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Study Hours Distribution -->
+        <div class="col-lg-4">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-clock-history text-warning"></i> Study Hours Distribution</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 260px;">
+                        <canvas id="reportHoursChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Model Comparison Chart -->
+        <div class="col-lg-4">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-diagram-3 text-info"></i> Machine Learning Accuracy</h5>
+                </div>
+                <div class="app-card-body">
+                    <div style="height: 260px;">
+                        <canvas id="reportModelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STRATEGIC INTERVENTION RECOMMENDATIONS FOR FACULTY -->
+    <div class="app-card mb-4">
+        <div class="app-card-header">
+            <h5><i class="bi bi-lightbulb-fill text-warning"></i> Departmental Academic Intervention Strategy</h5>
+        </div>
+        <div class="app-card-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-calendar2-range text-primary me-1"></i> Attendance Enforcement</h6>
+                        <p class="text-muted small mb-0">
+                            {{ data.stats.attendance_distribution[0] }} students have attendance below 60%. Faculty advisors should issue early attendance alerts before mid-semester examinations.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-journal-code text-success me-1"></i> Remedial Tutorials</h6>
+                        <p class="text-muted small mb-0">
+                            {{ data.stats.marks_distribution[0] }} students scored under 20 in internal assessments. Conduct weekly remedial tutorials focusing on high-weightage question solving.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-person-heart text-danger me-1"></i> Peer Mentorship</h6>
+                        <p class="text-muted small mb-0">
+                            Pair students in the "May Need Support" group with high-performing peers from the 85%+ attendance bracket for collaborative study sessions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Doughnut Chart
+    new Chart(document.getElementById('reportDoughnutChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Likely to Pass ({{ data.pass_pct }}%)', 'May Need Support ({{ data.support_pct }}%)'],
+            datasets: [{
+                data: [{{ data.stats.pass_count }}, {{ data.stats.support_count }}],
+                backgroundColor: ['#10b981', '#ef4444'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '65%'
+        }
+    });
+
+    // 2. Attendance Bar
+    new Chart(document.getElementById('reportAttChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['< 60%', '60-74%', '75-84%', '85-100%'],
+            datasets: [{
+                label: 'Students',
+                data: {{ data.stats.attendance_distribution | tojson }},
+                backgroundColor: ['#f87171', '#fbbf24', '#60a5fa', '#34d399'],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+    });
+
+    // 3. Marks Bar
+    new Chart(document.getElementById('reportMarksChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['0-19', '20-29', '30-39', '40-50'],
+            datasets: [{
+                label: 'Students',
+                data: {{ data.stats.marks_distribution | tojson }},
+                backgroundColor: '#8b5cf6',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+    });
+
+    // 4. Hours Bar
+    new Chart(document.getElementById('reportHoursChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['0-2 hrs', '2-4 hrs', '4-6 hrs', '6+ hrs'],
+            datasets: [{
+                label: 'Students',
+                data: {{ data.stats.hours_distribution | tojson }},
+                backgroundColor: '#f59e0b',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+    });
+
+    // 5. Model Accuracy
+    const modelNames = {{ data.model_results | map(attribute='model_name') | list | tojson }};
+    const modelAccs = {{ data.model_results | map(attribute='accuracy') | list | tojson }};
+    new Chart(document.getElementById('reportModelChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: modelNames,
+            datasets: [{
+                label: 'Accuracy (%)',
+                data: modelAccs,
+                backgroundColor: '#0284c7',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } },
+                x: { ticks: { font: { size: 10 } } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

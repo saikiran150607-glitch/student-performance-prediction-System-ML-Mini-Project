@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset Management | Student Performance Prediction System{% endblock %}
+{% block page_title %}Dataset Management & Training Data Ingestion{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- UPLOAD & TEMPLATE INFO ROW -->
+    <div class="row g-4 mb-4">
+        <!-- CSV Upload Card -->
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-cloud-arrow-up-fill text-primary"></i> Upload Custom Dataset (CSV)</h5>
+                </div>
+                <div class="app-card-body">
+                    <p class="text-muted small mb-3">
+                        Upload an institutional CSV file to evaluate data quality or retrain the machine learning algorithms. The file must follow the required column schema.
+                    </p>
+
+                    <form action="{{ url_for('upload_dataset') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="dataset_file" class="form-label fw-semibold small text-secondary">
+                                Select CSV File <span class="text-danger">*</span>
+                            </label>
+                            <input class="form-control" type="file" id="dataset_file" name="dataset_file" accept=".csv" required>
+                            <div class="form-text">Accepted format: <code>.csv</code> only (Maximum file size: 16 MB).</div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                                <i class="bi bi-upload me-1"></i> Upload & Validate CSV
+                            </button>
+                            <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-secondary px-3 py-2 rounded-3">
+                                <i class="bi bi-download me-1"></i> Download Sample CSV
+                            </a>
+                        </div>
+                    </form>
+
+                    {% if uploaded_info and uploaded_info.is_custom %}
+                    <div class="mt-4 pt-3 border-top d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                <i class="bi bi-check-circle-fill"></i> Custom Dataset Active
+                            </span>
+                            <small class="text-muted d-block mt-1">File: <strong>{{ uploaded_info.filename }}</strong></small>
+                        </div>
+                        <form action="{{ url_for('reset_sample_dataset') }}" method="POST">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirmAction('Reset to default illustrative sample dataset?');">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Sample Data
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Schema & Guidelines Card -->
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-header">
+                    <h5><i class="bi bi-info-circle text-info"></i> Expected CSV Schema</h5>
+                </div>
+                <div class="app-card-body">
+                    <p class="text-muted small mb-2">The system expects exactly these headers:</p>
+                    <div class="bg-light p-2 rounded-3 font-monospace small mb-3 border">
+                        student_id,attendance,study_hours,marks,result
+                    </div>
+
+                    <h6 class="fw-bold small text-dark mb-2">Field Specifications:</h6>
+                    <ul class="list-group list-group-flush small mb-3">
+                        <li class="list-group-item px-0 py-1 bg-transparent">
+                            <strong>student_id:</strong> Unique text identifier (e.g., STU001)
+                        </li>
+                        <li class="list-group-item px-0 py-1 bg-transparent">
+                            <strong>attendance:</strong> Float/Integer in range <code>0 to 100</code>
+                        </li>
+                        <li class="list-group-item px-0 py-1 bg-transparent">
+                            <strong>study_hours:</strong> Float/Integer in range <code>0 to 24</code>
+                        </li>
+                        <li class="list-group-item px-0 py-1 bg-transparent">
+                            <strong>marks:</strong> Internal score in range <code>0 to 50</code>
+                        </li>
+                        <li class="list-group-item px-0 py-1 bg-transparent">
+                            <strong>result:</strong> Target classification label (<code>Pass</code> or <code>Fail</code>)
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-warning py-2 px-3 small border-0 rounded-3 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        <strong>Machine Learning Integrity:</strong> Only ground-truth institutional labels must be uploaded. Model predictions should never be reused as training labels.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATASET HEALTH & VALIDATION REPORT -->
+    {% if dataset_report %}
+    <div class="app-card mb-4">
+        <div class="app-card-header d-flex justify-content-between align-items-center">
+            <h5><i class="bi bi-clipboard2-pulse-fill text-primary"></i> Dataset Validation Summary</h5>
+            <form action="{{ url_for('model_training') }}" method="POST">
+                <input type="hidden" name="dataset_source" value="{{ dataset_report.filename }}">
+                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-play-circle-fill me-1"></i> Train ML Models on this Dataset
+                </button>
+            </form>
+        </div>
+        <div class="app-card-body">
+            <!-- 4 Health Cards -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border text-center">
+                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Total Rows</small>
+                        <h4 class="fw-bold mb-0 text-dark">{{ dataset_report.total_rows }}</h4>
+                        <small class="text-muted">records parsed</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border text-center">
+                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Missing Values</small>
+                        <h4 class="fw-bold mb-0 {{ 'text-danger' if dataset_report.missing_values > 0 else 'text-success' }}">
+                            {{ dataset_report.missing_values }}
+                        </h4>
+                        <small class="text-muted">rows with NaNs</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border text-center">
+                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Duplicate IDs</small>
+                        <h4 class="fw-bold mb-0 {{ 'text-warning' if dataset_report.duplicate_rows > 0 else 'text-success' }}">
+                            {{ dataset_report.duplicate_rows }}
+                        </h4>
+                        <small class="text-muted">repeated identifiers</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 border text-center">
+                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Invalid Out-of-Range</small>
+                        <h4 class="fw-bold mb-0 {{ 'text-danger' if dataset_report.invalid_values > 0 else 'text-success' }}">
+                            {{ dataset_report.invalid_values }}
+                        </h4>
+                        <small class="text-muted">exceeded limits</small>
+                    </div>
+                </div>
+            </div>
+
+            {% if dataset_report.warnings %}
+                <div class="alert alert-info border-0 rounded-3 mb-3 small">
+                    <h6 class="fw-bold mb-1"><i class="bi bi-info-circle-fill me-1"></i> Data Quality Notes:</h6>
+                    <ul class="mb-0 ps-3">
+                        {% for w in dataset_report.warnings %}
+                            <li>{{ w }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Clean Data Preview Table -->
+            <h6 class="fw-bold text-dark mt-4 mb-2">
+                <i class="bi bi-table text-primary me-1"></i> Clean Dataset Preview (First 15 Rows)
+            </h6>
+            <div class="table-responsive border rounded-3">
+                <table class="table table-sm table-striped custom-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Attendance (%)</th>
+                            <th>Study Hours</th>
+                            <th>Internal Marks (/50)</th>
+                            <th>Ground Truth Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in dataset_report.preview_rows %}
+                        <tr>
+                            <td class="text-muted">{{ loop.index }}</td>
+                            <td class="fw-bold">{{ row.student_id }}</td>
+                            <td>{{ row.attendance }}%</td>
+                            <td>{{ row.study_hours }} hrs</td>
+                            <td><span class="fw-semibold">{{ row.marks }}</span>/50</td>
+                            <td>
+                                {% if row.result | lower == 'pass' %}
+                                    <span class="badge-pass"><i class="bi bi-check-circle-fill"></i> Pass</span>
+                                {% else %}
+                                    <span class="badge-support"><i class="bi bi-x-circle-fill"></i> Fail</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

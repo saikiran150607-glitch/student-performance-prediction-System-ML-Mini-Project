@@ -1,0 +1,118 @@
+{
+    "best_model_name": "Logistic Regression",
+    "trained_at": "2026-11-19 12:37:41",
+    "dataset_source": "sample_students.csv",
+    "total_samples": 150,
+    "train_samples": 120,
+    "test_samples": 30,
+    "pass_samples": 109,
+    "fail_samples": 41,
+    "features": [
+        "attendance",
+        "study_hours",
+        "marks"
+    ],
+    "best_metrics": {
+        "accuracy": 100.0,
+        "precision": 100.0,
+        "recall": 100.0,
+        "f1_score": 100.0,
+        "confusion_matrix": [
+            [
+                8,
+                0
+            ],
+            [
+                0,
+                22
+            ]
+        ],
+        "model_name": "Logistic Regression",
+        "cv_f1_mean": 99.13,
+        "cv_f1_std": 1.74,
+        "is_best": true
+    },
+    "all_models": [
+        {
+            "accuracy": 100.0,
+            "precision": 100.0,
+            "recall": 100.0,
+            "f1_score": 100.0,
+            "confusion_matrix": [
+                [
+                    8,
+                    0
+                ],
+                [
+                    0,
+                    22
+                ]
+            ],
+            "model_name": "Logistic Regression",
+            "cv_f1_mean": 99.13,
+            "cv_f1_std": 1.74,
+            "is_best": true
+        },
+        {
+            "accuracy": 100.0,
+            "precision": 100.0,
+            "recall": 100.0,
+            "f1_score": 100.0,
+            "confusion_matrix": [
+                [
+                    8,
+                    0
+                ],
+                [
+                    0,
+                    22
+                ]
+            ],
+            "model_name": "Decision Tree Classifier",
+            "cv_f1_mean": 100.0,
+            "cv_f1_std": 0.0,
+            "is_best": false
+        },
+        {
+            "accuracy": 100.0,
+            "precision": 100.0,
+            "recall": 100.0,
+            "f1_score": 100.0,
+            "confusion_matrix": [
+                [
+                    8,
+                    0
+                ],
+                [
+                    0,
+                    22
+                ]
+            ],
+            "model_name": "Random Forest Classifier",
+            "cv_f1_mean": 98.64,
+            "cv_f1_std": 1.77,
+            "is_best": false
+        },
+        {
+            "accuracy": 100.0,
+            "precision": 100.0,
+            "recall": 100.0,
+            "f1_score": 100.0,
+            "confusion_matrix": [
+                [
+                    8,
+                    0
+                ],
+                [
+                    0,
+                    22
+                ]
+            ],
+            "model_name": "K-Nearest Neighbors (KNN)",
+            "cv_f1_mean": 99.13,
+            "cv_f1_std": 1.74,
+            "is_best": false
+        }
+    ],
+    "warnings": []
+}
